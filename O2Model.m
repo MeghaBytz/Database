@@ -4,34 +4,29 @@ close all
 %Reaction set from "Applicability of self-consistent global model for
 %characterization of inductively coupled Cl2 plasma" Efremov et al
 
-% 
-stoichiometricMatrix = [-1	0	1	0	0	-1;
--1	0	0	1	1	-1;
--1	1	0	0	1	-1;
--1	2	0	0	0	-1;
-0	-1	0	1	0	0;
-0	1	0	-1	-1	0;
-0	1	-1	0	-1	0;
-0	1	0	0	-1	-1]
+stoichiometricMatrix = [-1	0	1	0	0	0	0	-1	;
+-1	1	0	0	1	0	0	-1	;
+-1	1	0	1	0	0	0	-1	;
+-1	0	0	1	1	0	0	-1	;
+-1	2	0	0	0	0	0	-1	;
+-1	1	0	0	0	0	1	-1	;
+0	-1	0	1	0	0	0	-1	;
+0	2	-1	0	0	0	0	-1	;
+1	-1	0	0	-1	0	0	0	;
+1	1	-1	0	-1	0	0	0	;
+0	3	-1	0	-1	0	0	0	;
+0	2	0	-1	-1	0	0	0	;
+-1	1	1	-1	0	0	0	0	;
+-1	0	0	0	0	1	0	-1	;
+1	0	0	0	0	-1	0	-1	;
+0	0	1	0	0	-1	0	-1	;
+0	1	0	0	1	-1	0	-1	;
+0	2	0	0	0	-1	0	0	;
+1	1	0	0	-1	-1	0	-1	;
+1	0	0	0	-1	-1	0	0	;
+0.5	-1	0	0	0	0	0	0	;
+1	0	0	0	0	-1	0	0]	;
 
-
-
-
-% stoichiometricMatrix = [-1	0	0	1	0	0	0	-1;
-% 0	-1	0	0	1	0	0	-1;
-% -1	0	0	0	1	0	1	-1;
-% 0	0	-1	0	0	1	0	-1;
-% -1	1	0	0	0	0	1	-1;
-% 0	1	0	0	0	0	-1	-1;
-% -1	2	0	0	0	0	0	-1;
-% 0	3	0	-1	0	0	-1	0;
-% 0	2	0	-1	0	0	-1	0;
-% 0	1	1	0	0	-1	-1	0;
-% -1	-2	0	0	0	0	0	0;
-% 1	-3	0	0	0	0	0	0;
-% 0	-2	-1	0	0	0	0	0;
-% 1	-1	0	0	0	0	0	0];
-%stoichiometricMatrix = [-2 0 0 0  1; 1 -1 1 1 -1 ];
 [numberOfReactions, numberOfSpecies] = size(stoichiometricMatrix);
 kRates = ones(1,numberOfReactions);
 speciesConcentrations = [2 1 2 1 2];
@@ -67,11 +62,10 @@ end
 
 %kinetic balance equations
 speciesConcentrations = sym('n', [1 numberOfSpecies]);
-
 kRates = sym('k', [1 numberOfReactions]);
 eqntest = cell(numberOfSpecies,1);
 
-for r = 1:numberOfSpecies
+for r = 1:numberOfSpecies-1
     for rxn = 1:numberOfReactions
         term = char(stoichiometricMatrix(rxn,r)*kRates(rxn));
         for species = 1:numberOfSpecies
@@ -91,19 +85,19 @@ end
 
 %mass balance eqn 
 
-
-%quasineutrality condition 
-%[Cl2 Cl Cl2+ Cl+ Cl- ne]
-charges = [0 0 1 1  -1 -1];
-quasineutralityCondition = [];
-for i=1:numberOfSpecies
-    q = char(speciesConcentrations(i)*charges(i))
-    if ~isempty(quasineutralityCondition)&&~strcmp(q,'0')
-        quasineutralityCondition = strcat(quasineutralityCondition,[' + ' q]);
-    elseif isempty(quasineutralityCondition)&&~strcmp(q,'0')
-        quasineutralityCondition = q;
-    end
-end
+% 
+% %quasineutrality condition 
+% %[Cl2 Cl Cl2+ Cl+ Cl- ne]
+% charges = [0 0 1 1  -1 -1];
+% quasineutralityCondition = [];
+% for i=1:numberOfSpecies
+%     q = char(speciesConcentrations(i)*charges(i))
+%     if ~isempty(quasineutralityCondition)&&~strcmp(q,'0')
+%         quasineutralityCondition = strcat(quasineutralityCondition,[' + ' q]);
+%     elseif isempty(quasineutralityCondition)&&~strcmp(q,'0')
+%         quasineutralityCondition = q;
+%     end
+% end
 
 %bohm velocity eqn
 
