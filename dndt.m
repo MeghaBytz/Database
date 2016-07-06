@@ -28,38 +28,45 @@ nOplus_ratio=nOplusbar/(nO2plusbar+nOplusbar);
 
 % calculating lambda
 % old way --> lambda=1/(330*p*1e-3)*1e-2; % in m
-lambda=1/(ng*scat_Xsec); % lambda in m
+lambda=1/(ng*scat_Xsec); % ion neutral mean free path
 
 % calculating values for O neutral & O2m
 vbarO=sqrt(8*ee*Ti/(pi*MO)); % average thermal velocity of O neutral
 vbarO2m=sqrt(8*ee*Ti/(pi*MO2)); % average thermal velocity of O2m
 DO=ee*Tg*lambda/vbarO/MO; % Diffusion coefficient of O neutral
 DO2m=ee*Tg*lambda/vbarO2m/MO2; % Diffusion coefficient of O2m
-dO=sqrt(4*DO*l_p*(2-gammaO)/vbarO/gammaO + l_p^2);
+
+dO=sqrt(4*DO*l_p*(2-gammaO)/vbarO/gammaO + l_p^2); %d = parabolic length scale based on diffusive flux to wall
 dO2m=sqrt(4*DO2m*l_p*(2-gammaO2m)/vbarO2m/gammaO2m + l_p^2);
-hAO=1/(1 + l_p*vbarO*gammaO/4/DO/(2-gammaO));
-hAO2m=1/(1 + l_p*vbarO2m*gammaO2m/4/DO2m/(2-gammaO2m));
-% wall recombination loss rate for O neutral
+hAO=1/(1 + l_p*vbarO*gammaO/4/DO/(2-gammaO)); %edge to center density ratio
+hAO2m=1/(1 + l_p*vbarO2m*gammaO2m/4/DO2m/(2-gammaO2m)); %edge to center density ratio
+
+% wall recombination loss rate for O neutrals = loss fluxa*area/volume
 KO=hAO*vbarO*2*gammaO/(2-gammaO)*area/volume/4;
 % wall recombination loss rate for O2m
 KO2m=hAO2m*vbarO2m*2*gammaO2m/(2-gammaO2m)*area/volume/4;
+
+%Compute effective volume for neutrals
 vol_O=volume*(1 - l_p^2/(3*dO^2))*(1 - (2/3)*l_p^3/(R*dO^2)...
- + l_p^4/(6*R^2*dO^2));
+ + l_p^4/(6*R^2*dO^2)); 
 vol_O2m=volume*(1 - l_p^2/(3*dO2m^2))*(1 - (2/3)*l_p^3/(R*dO2m^2)...
  + l_p^4/(6*R^2*dO2m^2));
+
 %finding alpha0
 eta=2*Tplus/(Tplus+Tminus);
 hl0=0.86/sqrt(3+eta*l_p/lambda);
 Rlambda=sqrt(2*pi/gamma_plus)*lambda/l_p/eta;
 uB_O2=sqrt(ee*Te/MO2);
 uB_O=sqrt(ee*Te/MO);
+
 % density-weighted Bohm velocity
 uB_dw=uB_O2*(1-nOplus_ratio)+uB_O*nOplus_ratio;
+
 % density-weighted Recombination rate coefficient
 Krec_dw=(Krec+Krec2)*(1-nOplus_ratio)+Krec3*nOplus_ratio;
 Rrec=Krec_dw*ne0*l_p/uB_dw;
 alphabar=nOminusbar/ne0;
-alpha0= fzero(@alpha0find,[1e-2 1e+2]); 
+alpha0= 1;%fzero(@alpha0find,[1e-2 1e2]);  %FIX THIS
 volminus=vol_minus(alpha0);
 %calculating peak(center) densities
 nOminus=nOminusbar*volume/volminus;
@@ -83,20 +90,21 @@ r_minus=R - l_p + l_minus;
 vol_rec=(2*pi*l_minus/(1+alpha0))*(8/15*alpha0*(r_minus^2 - 14/15*r_minus*l_minus + 4/15*l_minus^2) + 2/3*(r_minus^2 - 2/3*r_minus*l_minus + 1/6*l_minus^2));
 % Surface loss of electron-ion pair
 Kion=hl*uB_dw*area/volume;
+
 % other reaction coefficients
 %Kiz1=2.34E-15*Te^(1.03)*exp(-12.29/Te);
 Kei=2.2E-14*Te^(-0.5);
 Katt=1.07E-15*Te^(-1.391)*exp(-6.26/Te);
 Kiz2=9E-15*Te^(0.7)*exp(-13.6/Te);
-Kdiss=6.09*6.86E-15*exp(-6.29/Te);
+Kdiss=6.09*6.86E-15*exp(-6.29/Te); %why is this multiplied by 6.09
 Kiz3=7.1E-17*Te^0.5*exp(-17/Te);
 Kiz4=1.88E-16*Te^(1.699)*exp(-16.81/Te);
 Kex=1.37E-15*exp(-2.14/Te);
 Kizm=2.34E-15*Te^(1.03)*exp(-11.31/Te);
 Kattm=4.19E-15*Te^(-1.376)*exp(-5.19/Te);
 Kdeex=2.06E-15*exp(-1.163/Te);
-Kdism=6.09*6.86E-15*exp(-5.31/Te);
-% calculating Ec
+Kdism=6.09*6.86E-15*exp(-5.31/Te); %why is this multipliedby 6.09
+% calculating Ec (collisional energy loss per electron-ion pair created for the neutrals O2 and O 
 Ec_O=o_ec(Te);
 Ec_O2=o2_ec(Te);
 Eei_O=Efactor_O*Te;
@@ -106,7 +114,7 @@ Kel=rateconstant( EnergyO2, sigO2, Te );
 vbare=sqrt(8*ee*Te/(pi*me)); % average thermal velocity of electron
 lambda_E=vbare/ng/sqrt(3*Kel*Kex);
 vr_iz=1/(1 + 2*l_p/lambda_E);
-Kiz1=vr_iz*2.34E-15*Te^(1.03)*exp(-12.29/Te); % reduced Kiz1
+Kiz1=vr_iz*2.34E-15*Te^(1.03)*exp(-12.29/Te); % reduced Kiz1 %check this
 % differential EQ's
 % for nO2
 vdot(1)=Qmolec/volume + Krec*nO2plus*nOminus*vol_rec/volume...
