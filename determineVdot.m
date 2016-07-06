@@ -1,7 +1,4 @@
-clear all
-close all
-
-
+function governingEqns = determineVdot()
 
 
 charges = [0 0 1 1  -1 0 0 -1];
@@ -49,10 +46,12 @@ numberOfEqns = numberOfNeutrals + numberOfPositive+numberOfNegative + numberOfIn
 
 %Define starting indices in stoichiometric matrix for each type of species
 neutralStart = 1;
+neutralEnd = neutralStart + numberOfNeutrals-1;
 positiveStart = neutralStart+numberOfNeutrals;
+positiveEnd = positiveStart+numberOfPositive-1;
 negativeStart = positiveStart+numberOfPositive;
 intermediateStart = negativeStart + numberOfNegative;
-numberOfGaseousSpecies = intermediateStart+numberOfIntermediates;
+numberOfGaseousSpecies = intermediateStart+numberOfIntermediates-1;
 
 [numberOfReactions, numberOfSpecies] = size(stoichiometricMatrix);
 kRates = ones(1,numberOfReactions);
@@ -94,7 +93,7 @@ for i = 1:length(wallReactionIndices)
     wallMatrix(i,:) = stoichiometricMatrix(wallReactionIndices(i),:);
 end
 
-removalIndices = [recReactionIndices; wallReactionIndices];
+removalIndices = [recReactionIndices'; wallReactionIndices'];
 stoichiometricMatrix(removalIndices,:) = [];
 
 %add matrix back in
@@ -218,7 +217,7 @@ end
 %flags ionization reactions
 collReactionIndices = [];
 for k = 1:numberOfReactions
-    for i = neutralStart:numberOfNeutrals
+    for i = neutralStart:neutralEnd
             if stoichiometricMatrix(k,i)<0
                 if stoichiometricMatrix(k,i+numberOfNeutrals)>0 && nnz(stoichiometricMatrix(k,i+1:numberOfGaseousSpecies))==1 %looks at corresponding positive ion to neutral
                     collReactionIndices = [collReactionIndices k];
@@ -230,7 +229,7 @@ end
 %flag wall reactions with positive ions
 positiveWallReactionIndices = [];
 for k = numberOfReactions-numberOfWallReactions+1:numberOfReactions
-    for j = numberOfNeutrals+1:numberOfNeutrals+numberOfPositive
+    for j = positiveStart:positiveEnd
         if stoichiometricMatrix(k,j) < 0
             positiveWallReactionIndices = [positiveWallReactionIndices k];
         end
@@ -256,7 +255,7 @@ powerEqn = {'pabs'};
  
  %Write wall terms
  wallIndex = 0;
-  for i = numberOfNeutrals+1:numberOfNeutrals+numberOfPositiveWallReactions 
+  for i = positiveStart:positiveEnd
             wallIndex = wallIndex+1;
             wall_term = char(wallEnergyLoss(wallIndex)*kRates(positiveWallReactionIndices(wallIndex)));
             for species = 1:numberOfSpecies

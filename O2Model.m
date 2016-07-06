@@ -1,7 +1,4 @@
-clear all
-close all
-
-
+function governingEqns = determineVdot()
 
 
 charges = [0 0 1 1  -1 0 0 -1];
