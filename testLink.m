@@ -60,8 +60,9 @@ Kdet=1.6E-16;
 Kch=2.0E-17*sqrt(0.026/Tg);
 
 
-
-
+global test
+vdotVector = sym(determineVdot())
+test = matlabFunction(vdotVector)
 %starting and end time
 t0=0;
 tf=90;
@@ -84,10 +85,11 @@ nO20=ng0-nObar0-nO2mbar0
 Te0=2;
 pe0=1.5*(nO2plusbar0+nOplusbar0-nOminusbar0)*Te0; %quasineutrality condition for energy balance
 v0=[nO20 nO2plusbar0 nOplusbar0 nOminusbar0 nObar0 nO2mbar0 pe0];
-TEST = dndt([t0 tf],v0)
+[t,v] = ode23s(@(t,v)dndt_MJC(t,v),[t0 tf],v0);
 %[t,v] = ode23s(@dndt,[t0 tf],v0);
 end
-
+compare(:,1) = myV;
+compare(:,2) = vdot;
 
 
 

@@ -23,7 +23,7 @@ stoichiometricMatrix = [-1	0	1	0	0	0	0	-1	0	;
 1	0	0	0	0	-1	0	-1	0	;
 0	0	1	0	0	-1	0	-1	0	;
 0	1	0	0	1	-1	0	-1	0	;
-0	2	0	0	0	-1	0	0	0	;
+0	2	0	0	0	-1	0	-1	0	;
 1	1	0	0	-1	-1	0	0	0	;
 0.5	-1	0	0	0	0	0	0	-1	;
 1	0	0	0	0	-1	0	0	-1	;
@@ -99,6 +99,9 @@ stoichiometricMatrix(removalIndices,:) = [];
 %add matrix back in
 stoichiometricMatrix = [stoichiometricMatrix;recMatrix];
 stoichiometricMatrix = [stoichiometricMatrix;wallMatrix];
+startingRecIndex = numberOfReactions - numberOfWallReactions - numberOfRecombinationReactions+1;
+endingRecIndex = numberOfReactions - numberOfWallReactions;
+startingWallIndex = numberOfReactions - numberOfWallReactions +1;
 
 %{'a2*a5*k2 - 2*a1^2*k1'}
 for i = 1:numberOfReactions 
@@ -162,7 +165,7 @@ end
 
 %Add recombination reaction terms (uses peak species concentrations)
 for r = 1:numberOfGaseousSpecies
-    for rxn = numberOfReactions-numberOfRecombinationReactions:numberOfReactions
+    for rxn = startingRecIndex:endingRecIndex
         term = char(stoichiometricMatrix(rxn,r)*kRates(rxn));
         for species = 1:numberOfSpecies
             m1 = char(peakSpeciesConcentrations(species)^reducedMatrix(rxn,species,r));
@@ -181,7 +184,7 @@ end
 
 %Adds wall reaction terms (also uses peak species concentrations)
 for r = 1:numberOfGaseousSpecies
-    for rxn = numberOfReactions-(numberOfRecombinationReactions + numberOfWallReactions):numberOfReactions
+    for rxn = startingWallIndex:numberOfReactions
         term = char(stoichiometricMatrix(rxn,r)*kRates(rxn));
         for species = 1:numberOfSpecies
             m1 = char(peakSpeciesConcentrations(species)^reducedMatrix(rxn,species,r));

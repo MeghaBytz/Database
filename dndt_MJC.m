@@ -1,4 +1,4 @@
-function vdot = dndt(t,v)
+function [myV] = dndt_MJC(t,v)
 
 global ee me MO MO2 ng Tg Ti l_p gammaO gammaO2m Efactor_O2
 global Efactor_O EnergyO2 sigO2 EnergyO sigO
@@ -6,22 +6,17 @@ global Krec Krec2 Krec3 Krec4 Kdet Kch Rlambda hl0 Rrec alphabar
 global pabs R area volume QtorrLit Qmolec Kpump scat_Xsec
 
 %set variables equal to initial concentrations in v vector
-%vdot=zeros(7,1);
+vdot=zeros(6,1);
+myV = vdot;
 nO2=v(1);
 nO2plusbar=v(2);
 nOplusbar=v(3);
 nOminusbar=v(4);
 nObar=v(5);
 nO2mbar=v(6);
-pe=v(7); %pe = 1.5*ne*Te
+nOmbar = v(7);
+pe=v(end); %pe = 1.5*ne*Te
 
-%define my value
-n1 = nO2;
-n2 = nO;
-n3 = nO2plusbar;
-n4 = nOplusbar;
-n5 = nOminusbar;
-n6 = nO2mbar;
 
 ng=nO2+nObar+nO2mbar; %total oxygen concentration
 ne0=nO2plusbar+nOplusbar-nOminusbar; %quasineutrality condition
@@ -85,7 +80,7 @@ nOplus=nplus*nOplus_ratio;
 nO2plus=nplus-nOplus;
 nO=nObar*volume/vol_O;
 nO2m=nO2mbar*volume/vol_O2m;
-np
+
 % calculation of hl factors with 3 models
 % density weighted positive ion mass
 Mplus_dw=MO2*(1-nOplus_ratio)+MO*nOplus_ratio;
@@ -126,41 +121,112 @@ vbare=sqrt(8*ee*Te/(pi*me)); % average thermal velocity of electron
 lambda_E=vbare/ng/sqrt(3*Kel*Kex);
 vr_iz=1/(1 + 2*l_p/lambda_E);
 Kiz1=vr_iz*2.34E-15*Te^(1.03)*exp(-12.29/Te); % reduced Kiz1 %check this
+%define my variables
+k1=	Kiz1;
+k2=	Katt;
+k3=	Kiz4;
+k4=	Kiz3;
+k5=	Kdiss;
+k6=	0;
+k7=	Kiz2;
+k8=	Kei;
+k9=	Kdet;
+k10=Kch;
+k11=Kex;
+k12=Kdeex;
+k13=Kizm;
+k14=Kattm;
+k15=Kdism;
+k16=Krec4;
+k17=Krec;
+k18=Krec2;
+k19=Krec3;
+k20=KO;
+k21=KO2m;
+k22=Kion;
+k23=Kion;
+n1 = nO2;
+n2 = nObar;
+n3 = nO2plusbar;
+n4 = nOplusbar;
+n5 = nOminusbar;
+n6 = nO2mbar;
+n7 = nOmbar;
+n8 = ne0;
 
-
-
+np2 = nO;
+np3 = nO2plus;
+np4 = nOplus;
+np5 = nOminus;
+np6 = nO2m;
+np9 = 1;
+Vrec = vol_rec;
+V = volume;
+Q1 = Qmolec;
+Ec_1 = Ec_O2;
+Ec_2 = Ec_O;
+Ew_1 = Eei_O2;
+Ew_2 = Eei_O;
 % differential EQ's
 % for nO2
-vdotVector = determineVdot();
-vdot(1) = sym(vdotVector(1));
+a = 1;
+b = 2;
 
-vdot(1)=Qmolec/volume + Krec*nO2plus*nOminus*vol_rec/volume...
- + Kdet*nOminusbar*nObar + Kdeex*nO2mbar*ne0...
- + Krec4*nO2mbar*nOminusbar + Kion*nO2plus + KO2m*nO2m...
- + 0.5*KO*nO - (Kiz1 + Katt + Kdiss + Kiz3 + Kiz4 + Kex)*nO2*ne0...
- - Kch*nOplusbar*nO2 - Kpump*nO2;
-% for nO2plus
-vdot(2)=Kiz1*nO2*ne0 + Kizm*nO2mbar*ne0 + Kch*nOplusbar*nO2...
- -(Krec + Krec2)*nO2plus*nOminus*vol_rec/volume...
- - Kei*ne0*nO2plusbar - Kion*nO2plus;
-% for nOplus
-vdot(3)=Kiz2*nObar*ne0 + (Kiz3 + Kiz4)*nO2*ne0...
- - Krec3*nOplus*nOminus*vol_rec/volume - Kch*nOplusbar*nO2...
- - Kion*nOplus;
-% for nOminus
-vdot(4)=(Katt+Kiz3)*nO2*ne0 + Kattm*nO2mbar*ne0...
- - ((Krec+Krec2)*nO2plus*nOminus+Krec3*nOplus*nOminus)...
- *vol_rec/volume - Kdet*nOminusbar*nObar - Krec4*nOminusbar*nO2mbar;
-% for nO
-vdot(5)=2*Kei*ne0*nO2plusbar + (2*Kdiss+Katt+Kiz4)*ne0*nO2...
- + (Krec+3*Krec2)*nO2plus*nOminus*vol_rec/volume...
- + 2*Krec3*nOplus*nOminus*vol_rec/volume + Kch*nOplusbar*nO2...
- + (Kattm+2*Kdism)*nO2mbar*ne0 + Krec4*nOminusbar*nO2mbar...
- + Kion*nOplus - Kiz2*nObar*ne0 - Kdet*nOminusbar*nObar...
- - KO*nO - Kpump*nObar;
-% for nO2m
-vdot(6)=Kex*nO2*ne0 - (Kizm+Kattm+Kdeex+Kdism)*nO2mbar*ne0...
- - Krec4*nO2mbar*nOminusbar - KO2m*nO2m - Kpump*nO2mbar; 
-% for power balance
-vdot(7)=pabs - Ec_O2*Kiz1*nO2*ne0 - Ec_O*Kiz2*nObar*ne0...
- - Eei_O*Kion*nOplus - Eei_O2*Kion*nO2plus; 
+%append to this file
+%vdotVector = determineVdot();
+%nO2
+% myV(1) = subs(vdotVector(1));
+% %nO2plus
+% myV(2) = subs(vdotVector(3));
+% %nOplus
+% myV(3) = subs(vdotVector(4));
+% %nOminus
+% myV(4) = subs(vdotVector(5));
+% %nO
+% myV(5) = subs(vdotVector(2));
+% %nO2m
+% myV(6) = subs(vdotVector(6));
+% %powereqn
+% myV(7) = subs(vdotVector(8));
+
+% %no2
+% vdot(1)=Qmolec/volume + Krec*nO2plus*nOminus*vol_rec/volume...
+%  + Kdet*nOminusbar*nObar + Kdeex*nO2mbar*ne0...
+%  + Krec4*nO2mbar*nOminusbar + Kion*nO2plus + KO2m*nO2m...
+%  + 0.5*KO*nO - (Kiz1 + Katt + Kdiss + Kiz3 + Kiz4 + Kex)*nO2*ne0...
+%  - Kch*nOplusbar*nO2 - Kpump*nO2;
+% %no
+% vdot(2)=2*Kei*ne0*nO2plusbar + (2*Kdiss+Katt+Kiz4)*ne0*nO2...
+%  + (Krec+3*Krec2)*nO2plus*nOminus*vol_rec/volume...
+%  + 2*Krec3*nOplus*nOminus*vol_rec/volume + Kch*nOplusbar*nO2...
+%  + (Kattm+2*Kdism)*nO2mbar*ne0 + Krec4*nOminusbar*nO2mbar...
+%  + Kion*nOplus - Kiz2*nObar*ne0 - Kdet*nOminusbar*nObar...
+%  - KO*nO - Kpump*nObar;
+% % for nO2plus
+% vdot(3)=Kiz1*nO2*ne0 + Kizm*nO2mbar*ne0 + Kch*nOplusbar*nO2...
+%  -(Krec + Krec2)*nO2plus*nOminus*vol_rec/volume...
+%  - Kei*ne0*nO2plusbar - Kion*nO2plus;
+% % for nOplus
+% vdot(4)=Kiz2*nObar*ne0 + (Kiz3 + Kiz4)*nO2*ne0...
+%  - Krec3*nOplus*nOminus*vol_rec/volume - Kch*nOplusbar*nO2...
+%  - Kion*nOplus;
+% % for nOminus
+% vdot(5)=(Katt+Kiz3)*nO2*ne0 + Kattm*nO2mbar*ne0...
+%  - ((Krec+Krec2)*nO2plus*nOminus+Krec3*nOplus*nOminus)...
+%  *vol_rec/volume - Kdet*nOminusbar*nObar - Krec4*nOminusbar*nO2mbar;
+% % for nO2m
+% vdot(6)=Kex*nO2*ne0 - (Kizm+Kattm+Kdeex+Kdism)*nO2mbar*ne0...
+%  - Krec4*nO2mbar*nOminusbar - KO2m*nO2m - Kpump*nO2mbar; 
+% % for power balance
+% vdot(7)=pabs - Ec_O2*Kiz1*nO2*ne0 - Ec_O*Kiz2*nObar*ne0...
+%  - Eei_O*Kion*nOplus - Eei_O2*Kion*nO2plus; 
+
+myV(1)=-k1 * n1 * n8 + -k2 * n1 * n8 + -k3 * n1 * n8 + -k4 * n1 * n8 + -k5 * n1 * n8 + -k6 * n1 * n8 + k9 * n2 * n5 + -k10 * n1 * n4 + -k11 * n1 * n8 + k12 * n6 * n8 + k16 * n5 * n6 - Kpump*n1 + k17 * np3 * np5 * Vrec/V + k20/2 * np2 * np9 + k21 * np6 * np9 + k22 * np3 * np9 + Q1/V;
+myV(2)=k2 * n1 * n8 + k3 * n1 * n8 + 2*k5 * n1 * n8 + k6 * n1 * n8 + -k7 * n2 * n8 + 2*k8 * n3 * n8 + -k9 * n2 * n5 + k10 * n1 * n4 + k14 * n6 * n8 + 2*k15 * n6 * n8 + k16 * n5 * n6 - Kpump*n2 + k17 * np3 * np5 * Vrec/V + 3*k18 * np3 * np5 * Vrec/V + 2*k19 * np4 * np5 * Vrec/V + -k20 * np2 * np9 + k23 * np4 * np9;
+myV(3)=k1 * n1 * n8 + -k8 * n3 * n8 + k10 * n1 * n4 + k13 * n6 * n8 + -k17 * np3 * np5 * Vrec/V + -k18 * np3 * np5 * Vrec/V + -k22 * np3 * np9;
+myV(4)=k3 * n1 * n8 + k4 * n1 * n8 + k7 * n2 * n8 + -k10 * n1 * n4 + -k19 * np4 * np5 * Vrec/V + -k23 * np4 * np9;
+myV(5)=k2 * n1 * n8 + k4 * n1 * n8 + -k9 * n2 * n5 + k14 * n6 * n8 + -k16 * n5 * n6 + -k17 * np3 * np5 * Vrec/V + -k18 * np3 * np5 * Vrec/V + -k19 * np4 * np5 * Vrec/V;
+myV(6)=k11 * n1 * n8 + -k12 * n6 * n8 + -k13 * n6 * n8 + -k14 * n6 * n8 + -k15 * n6 * n8 + -k16 * n5 * n6 - Kpump*n6 + -k21 * np6 * np9;
+%myV(7)=k6 * n1 * n8 - Kpump*n7;
+myV(7)=pabs - Ec_1*k1 * n1 * n8 - Ec_2*k7 * n2 * n8 - Ew_1*k22 * np3 * np9 - Ew_2*k23 * np4 * np9;
+

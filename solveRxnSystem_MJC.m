@@ -46,8 +46,8 @@ Pabs=2000; % total absorbed power in watts [adjustable]
 pabs=Pabs/(ee*volume); 
 
 % starting pressures in mTorr (180W)
-
-ppvec=[6.02 13.06 21.81 30.60 34.86 43.64 52.09 60.75]
+ppvec=[6.02  30.60  60.75]
+%ppvec=[6.02 13.06 21.81 30.60 34.86 43.64 52.09 60.75]
 Qvec=[40 50 50 50 50 50 50 50] % O2 flow rate in sccm
 % atomic oxygen surface recombination rate
 gammaOvec=[0.5 0.43 0.33 0.27 0.23 0.2 0.15 0.13] %gets to smaller values as pressure increases
@@ -66,7 +66,7 @@ Kch=2.0E-17*sqrt(0.026/Tg);
 %starting and end time
 t0=0;
 tf=90;
-vdotVector = sym(determineVdot());
+tic
 for ii=1:1%length(ppvec)
 gammaO=gammaOvec(ii)
 p=ppvec(ii);
@@ -82,19 +82,22 @@ nOplusbar0=1E16;
 nOminusbar0=3E15;
 nObar0=2E17;
 nO2mbar0=0.01*ng0;
+nOmbar0=0.01*ng0;
 nO20=ng0-nObar0-nO2mbar0;
 Te0=2;
 pe0=1.5*(nO2plusbar0+nOplusbar0-nOminusbar0)*Te0; %quasineutrality condition for energy balance
-v0=[nO20 nO2plusbar0 nOplusbar0 nOminusbar0 nObar0 nO2mbar0 pe0];
+%v0=[nO20 nO2plusbar0 nOplusbar0 nOminusbar0 nObar0 nO2mbar0 nOmbar0 pe0];
+v0=[nO20 nO2plusbar0 nOplusbar0 nOminusbar0 nOmbar0 nO2mbar0 pe0];
 [t,v] = ode23s('dndt_MJC',[t0 tf],v0);
+%[t,v] = ode23s(@(t,v)dndt_MJC(t,v),[t0 tf],v0);
 nO2=v(:,1);
-nO2plusbar=v(:,2);
-nOplusbar=v(:,3);
-nOminusbar=v(:,4);
+nO2plusbar=v(:,3);
+nOplusbar=v(:,4);
+nOminusbar=v(:,5);
 ne0=nO2plusbar+nOplusbar-nOminusbar; %quasineutrality condition
-nObar=v(:,5);
+nObar=v(:,2);
 nO2mbar=v(:,6);
-Te=v(:,7)./(1.5.*ne0);
+Te=v(:,end)./(1.5.*ne0);
 % getting the data at the final equilibrium
 final_nO2=nO2(end);
 n_O2=final_nO2*1e-6; % in cm^-3
@@ -121,39 +124,39 @@ final_p=final_ng/3.3e19*(Tg/0.026) % final pressure in mTorr
 % ratio for density weighting
 nOp_ratio=final_nOplusbar/(final_nO2plusbar+final_nOplusbar);
 % plotting the results
-figure(ii)
-subplot(7,1,1)
-plot(t,nO2plusbar,t, ne0,'--')
-ylabel('n_{{O_2}^+}, n_{e0} (m^{-3})')
-axis([0 inf 0 final_nO2plusbar*1.5])
-title(['Flowrate=',num2str(Qsccm),'sccm, P_{abs}=',num2str(Pabs),...
- 'W, p_0=',num2str(p),'mTorr, p_f=',num2str(round(final_p)),...
- 'mTorr'])
-subplot(7,1,2)
-plot(t,nOplusbar)
-ylabel('n_{O^+} (m^{-3})')
-axis([0 inf 0 final_nOplusbar*1.5])
-subplot(7,1,3)
-plot(t,nOminusbar)
-ylabel('n_{O^-} (m^{-3})')
-axis([0 inf 0 final_nOminusbar*1.5])
-subplot(7,1,4)
-plot(t,nObar)
-ylabel('n_O (m^{-3})')
-axis([0 inf 0 final_nObar*1.5])
-subplot(7,1,5)
-plot(t,nO2mbar)
-ylabel('n_{{O_2}*} (m^{-3})')
-axis([0 inf 0 final_nO2mbar*1.5])
-subplot(7,1,6)
-plot(t,nO2)
-ylabel('n_{O_2} (m^{-3})')
-axis([0 inf 0 final_nO2*1.5])
-subplot(7,1,7)
-plot(t,Te)
-xlabel('t (sec)')
-ylabel('T_e (m^{-3})')
-axis([0 inf 0 final_Te*1.5])
+% figure(ii)
+% subplot(7,1,1)
+% plot(t,nO2plusbar,t, ne0,'--')
+% ylabel('n_{{O_2}^+}, n_{e0} (m^{-3})')
+% axis([0 inf 0 final_nO2plusbar*1.5])
+% title(['Flowrate=',num2str(Qsccm),'sccm, P_{abs}=',num2str(Pabs),...
+%  'W, p_0=',num2str(p),'mTorr, p_f=',num2str(round(final_p)),...
+%  'mTorr'])
+% subplot(7,1,2)
+% plot(t,nOplusbar)
+% ylabel('n_{O^+} (m^{-3})')
+% axis([0 inf 0 final_nOplusbar*1.5])
+% subplot(7,1,3)
+% plot(t,nOminusbar)
+% ylabel('n_{O^-} (m^{-3})')
+% axis([0 inf 0 final_nOminusbar*1.5])
+% subplot(7,1,4)
+% plot(t,nObar)
+% ylabel('n_O (m^{-3})')
+% axis([0 inf 0 final_nObar*1.5])
+% subplot(7,1,5)
+% plot(t,nO2mbar)
+% ylabel('n_{{O_2}*} (m^{-3})')
+% axis([0 inf 0 final_nO2mbar*1.5])
+% subplot(7,1,6)
+% plot(t,nO2)
+% ylabel('n_{O_2} (m^{-3})')
+% axis([0 inf 0 final_nO2*1.5])
+% subplot(7,1,7)
+% plot(t,Te)
+% xlabel('t (sec)')
+% ylabel('T_e (m^{-3})')
+% axis([0 inf 0 final_Te*1.5])
 % calculating values for O neutral & O2m
 lambda=1/(final_ng*scat_Xsec) % lambda in m
 vbarO=sqrt(8*ee*Ti/(pi*MO)) % average thermal velocity of O neutral
@@ -162,7 +165,7 @@ DO=ee*Tg*lambda/vbarO/MO % Diffusion coefficient of O neutral
 DO2m=ee*Tg*lambda/vbarO2m/MO2 % Diffusion coefficient of O2m
 dO=sqrt(4*DO*l_p*(2-gammaO)/vbarO/gammaO + l_p^2);
 dO2m=sqrt(4*DO2m*l_p*(2-gammaO2m)/vbarO2m/gammaO2m + l_p^2);
-hAO=1/(1 + l_p*vbarO*gammaO/4/DO/(2-gammaO))
+hAO=1/(1 + l_p*vbarO*gammaO/4/DO/(2-gammaO)) 
 hAO2m=1/(1 + l_p*vbarO2m*gammaO2m/4/DO2m/(2-gammaO2m)) 
 vol_O=volume*(1 - l_p^2/(3*dO^2))*(1 - (2/3)*l_p^3/(R*dO^2)...
  + l_p^4/(6*R^2*dO^2));
@@ -223,10 +226,26 @@ vol_rec=(2*pi*final_lminus/(1+alpha0))*(8/15*alpha0*...
 vrec_ratio=vol_rec/volume;
 % ion flux
 dissociation_rate = final_nObar/final_ng
-nplus_flux=final_hl*final_nplus*final_uB_dw*1e-4 % in /cm^2/s
-nO_flux=hAO*final_nO*vbarO/4*1e-4 % in /cm^2/s
+nplus_flux=final_hl*final_nplus*final_uB_dw*1e-4 % in /cm^2/s %final hl = wall loss factor
+nO_flux=hAO*final_nO*vbarO/4*1e-4 % in /cm^2/s %flux in spherical coordinates is 1/4nVbar
 flux_ratio=nO_flux/nplus_flux
 lambda_cm=lambda/1e-2 % in cm
+wallLossFactors = [hAO final_hl];
+radicalVelocities = [vbarO] 
+ionVelocities = [final_uB_O2 final_uB_O] %make general using charge indexes
+%Calculate etch rate
+%set these to arbitrary values for function testing -- eventually will take
+%values from Bayesian inference
+radicals = n_O;
+ions = [n_O2plus n_Oplus];
+numberOfIons = length(ions);
+numberOfRadicals = length(radicals);
+sputteringYield = ones(numberOfIons,1);
+ionStimulatedDesorption = ones(numberOfIons,1);
+rxnProb = ones(numberOfRadicals,1);
+etchRate(ii) = calcEtchRate(radicals, ions, rxnProb, sputteringYield, ionStimulatedDesorption, wallLossFactors,radicalVelocities, ionVelocities)
+
+
 % save results
 allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
  n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...
@@ -235,6 +254,8 @@ allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
  lminus_over_l_p;Rminus;Lminus;vratio;vrec_ratio;...
  lambda_cm;dissociation_rate;nplus_flux;nO_flux;flux_ratio];
 end
+time = toc;
+plot(ppvec,etchRate);
 % save results to a file
 % filename=[num2str(Pabs),'W_results.txt']
 % save(filename,'allresults','-ASCII','-double'); 
