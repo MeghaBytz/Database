@@ -1,6 +1,7 @@
-function etchRate = calcEtchRate(radicals, ions, wallLossFactors,radicalVelocities, ionVelocities,current)
+function etchRate = calcEtchRate(radicals, ions, rxnProb, sputteringYield, ionStimulatedDesorption, wallLossFactors,radicalVelocities, ionVelocities, current)
 global noUnknowns
 global numberOfIons
+global numberOfRadicals
 %Surface Kinetics model
 %determine free surface sites
 %default to values of MgO but need to make this generalized

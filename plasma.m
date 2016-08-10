@@ -4,6 +4,8 @@ global ee me MO MO2 ng Tg Ti l_p gammaO gammaO2m
 global Efactor_O2 Efactor_O EnergyO2 sigO2 EnergyO sigO
 global Krec Krec2 Krec3 Krec4 Kdet Kch Rlambda hl0 Rrec alphabar
 global pabs R area volume QtorrLit Qmolec Kpump scat_Xsec
+global numberOfIons
+global numberOfRadicals
 ee=1.6022E-19;
 me=9.1095E-31; % mass of electron
 MO=1836*16*me; % mass of an Oxygen atom
@@ -31,13 +33,9 @@ sigO = sigmaO * 1e-20;
 Pabs=180 % total absorbed power in watts [adjustable] 
 pabs=Pabs/(ee*volume);
 % starting pressures in mTorr (180W)
-ppvec=[6.02 13.06 21.81 30.60 34.86 43.64 52.09 60.75]
-Qvec=[40 50 50 50 50 50 50 50] % O2 flow rate in sccm
 % atomic oxygen surface recombination rate
-gammaOvec=[0.5 0.43 0.33 0.27 0.23 0.2 0.15 0.13]
-allresults=zeros(35,length(ppvec)); % number of items to save=35
-for ii=1:length(ppvec)
-gammaO=gammaOvec(ii)
+
+gammaO=expConditions(i,3)
 p=expConditions(i,1)
 Qsccm=expConditions(i,2)
 QtorrLit=Qsccm/79.05; % sccm to Torr-Liter/sec
@@ -215,20 +213,18 @@ ionVelocities = [final_uB_O2 final_uB_O] %make general using charge indexes
 %values from Bayesian inference
 radicals = n_O;
 ions = [n_O2plus n_Oplus];
-numberOfIons = length(ions);
-numberOfRadicals = length(radicals);
 sputteringYield = ones(numberOfIons,1);
 ionStimulatedDesorption = ones(numberOfIons,1);
 rxnProb = ones(numberOfRadicals,1);
 etchRate = calcEtchRate(radicals, ions, rxnProb, sputteringYield, ionStimulatedDesorption, wallLossFactors,radicalVelocities, ionVelocities, current)
 % save results
-allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
- n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...
- n_Ominus_bar;n_O_bar;n_O2m_bar;n_O2;final_Te;final_Ec_O2;...
- final_Ec_O; alpha0;alphabar;gamma_plusf;final_hl;...
- lminus_over_l_p;Rminus;Lminus;vratio;vrec_ratio;...
- lambda_cm;dissociation_rate;nplus_flux;nO_flux;flux_ratio];
-end
+% allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
+%  n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...
+%  n_Ominus_bar;n_O_bar;n_O2m_bar;n_O2;final_Te;final_Ec_O2;...
+%  final_Ec_O; alpha0;alphabar;gamma_plusf;final_hl;...
+%  lminus_over_l_p;Rminus;Lminus;vratio;vrec_ratio;...
+%  lambda_cm;dissociation_rate;nplus_flux;nO_flux;flux_ratio];
+
 % save results to a file
-filename=[num2str(Pabs),'W_results.txt']
-save(filename,'allresults','-ASCII','-double'); 
+% filename=[num2str(Pabs),'W_results.txt']
+% save(filename,'allresults','-ASCII','-double'); 

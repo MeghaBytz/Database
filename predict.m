@@ -26,7 +26,7 @@ proposalMean = [5 5 5 5 .5]
 proposalSD =  [2 2 2 2 1];
 priorLB = zeros(noUnknowns,1);
 priorUB = [10 10 10 10 1];
-data = [3 5 3];
+data = [.1 0.4 0.3];
 
 %Bayesian model method
 load expConditions
@@ -34,7 +34,7 @@ load expConditions
 current = zeros(noUnknowns,1);
 %Peform MH iterations
 PosteriorCurrent = Posterior(current,1);
-N = 100;
+N = 2;
 theta = zeros(N*noUnknowns,noUnknowns);
 acc = zeros(1,noUnknowns);
 for i = 1:noUnknowns
