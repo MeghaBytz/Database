@@ -7,8 +7,7 @@ global proposalRecord
 global proposalMean
 global proposalLB
 global proposalUB
-q = 1;
-q=1;
-q = lognpdf(new(index),proposalMean(index),chainSD)*q;
+%q = normpdf(new(index),proposalMean(index),proposalSD(index));
+q = unifpdf(new(index),proposalLB(index),proposalUB(index));
 F = log(q);
 end

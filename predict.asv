@@ -20,21 +20,17 @@ global proposalSD
 global numberOfIons
 global numberOfRadicals
 global expConditions
-global y
-global noTrainingData
-global noTestData
-global algernonEtchRatesWithNoise
 
 
 numberOfIons = 2;
 numberOfRadicals = 1;
-noUnknowns = numberOfIons*2+numberOfRadicals*2+1;
-proposalLB = [0 0 0 0 0 0 .01]
-proposalUB = [2 2 2 2 2 2 10];
-proposalMean = [1 1 1 1 1 1 5];
+noUnknowns = numberOfIons*2+numberOfRadicals*2;
+proposalLB = zeros(noUnknowns,1);
+proposalUB = [1 1 1 1 1 1];
+proposalMean = [1 1 1 1 1 1];
 proposalSD =  ones(noUnknowns,1)*0.5;
-priorLB = [0 0 0 0 0 0 .01]
-priorUB = [2 2 2 2 2 2 10];
+priorLB = zeros(noUnknowns,1);
+priorUB = ones(noUnknowns,1);
 
 
 %Bayesian model method
@@ -50,8 +46,8 @@ algernonEtchRatesWithNoise = algernonEtchRates + sd*randn(size(algernonEtchRates
 noTrainingData = 6;
 noTestData = 10;
 k = noTrainingData + noTestData;
-y = randsample(length(algernonEtchRatesWithNoise),k);
-data = algernonEtchRatesWithNoise(y(1:noTrainingData));
+y = randsample(length(algernonEtchRates),k);
+data = algernonEtchRates(y(1:noTrainingData));
 expConditions = allSynExpConditions(y(1:noTrainingData),:);
 
 %realParameters = [.05 .05 .05 .05 0.25]
@@ -59,7 +55,7 @@ expConditions = allSynExpConditions(y(1:noTrainingData),:);
 current = ones(noUnknowns,1);
 %Peform MH iterations
 
-N = 1000;
+N = 500;
 theta = zeros(N*noUnknowns,noUnknowns);
 acc = zeros(1,noUnknowns);
 PosteriorCurrent = Posterior(current,1);
@@ -138,4 +134,3 @@ for k =1:noUnknowns
     ylabel('Value');
 end
 
-%genPlots(theta)
