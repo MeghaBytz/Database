@@ -1,4 +1,5 @@
-function etchRate = plasma(current,i)
+%function etchRate = plasma(current,i)
+i=1;
 global ee me MO MO2 ng Tg Ti l_p gammaO gammaO2m
 global Efactor_O2 Efactor_O EnergyO2 sigO2 EnergyO sigO
 global Krec Krec2 Krec3 Krec4 Kdet Kch Rlambda hl0 Rrec alphabar
@@ -6,6 +7,8 @@ global pabs R area volume QtorrLit Qmolec Kpump scat_Xsec
 global numberOfIons
 global numberOfRadicals
 global expConditions
+global viewFactor
+
 ee=1.6022E-19;
 me=9.1095E-31; % mass of electron
 MO=1836*16*me; % mass of an Oxygen atom
@@ -208,18 +211,20 @@ vrec_ratio=vol_rec/volume;
 dissociation_rate = final_nObar/final_ng;
 
 %need to make these calculations general
-nplus_flux=final_hl*final_nplus*final_uB_dw*1e-4; % in /cm^2/s
-nOplus_flux=final_hl*final_nOplus*final_uB_dw*1e-4; % in /cm^2/s
-nO2plus_flux=final_hl*final_nplus*final_uB_dw*1e-4; % in /cm^2/s
-nO_flux=hAO*final_nO*vbarO/4*1e-4; % in /cm^2/s
+nplus_flux=final_hl*final_nplus*final_uB_dw*1e-4 % in /cm^2/s
+nOplus_flux=final_hl*final_nOplus*final_uB_dw*1e-4 % in /cm^2/s
+nO2plus_flux=final_hl*final_nplus*final_uB_dw*1e-4 % in /cm^2/s
+nO_flux=hAO*final_nO*vbarO/4*1e-4 % in /cm^2/s
 nO2m_flux=hAO*final_nO2m*vbarO2m/4*1e-4; % in /cm^2/s
 flux_ratio=nO_flux/nplus_flux;
 lambda_cm=lambda/1e-2; % in cm
-fluxes = [nO2plus_flux nOplus_flux nO_flux nO2m_flux]
+
+densities = [final_nplus final_nOplus final_nO2plus final_nO final_nO2m]
+fluxes = calcFluxes(densities, Te);
+%fluxes = [nO2plus_flux nOplus_flux nO_flux nO2m_flux]
 
 %Calculate etch rate
-current
-etchRate = calcEtchRate(final_Te,fluxes, current);
+etchRate = calcEtchRate(final_Te,fluxes, current)
 % save results
 % allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
 %  n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...

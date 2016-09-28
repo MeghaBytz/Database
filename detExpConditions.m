@@ -1,4 +1,4 @@
-% starting pressures in mTorr (180W)
+P% starting pressures in mTorr (180W)
 ppvec=[6.02 13.06 21.81 30.60 34.86 43.64 52.09 60.75]
 Qvec=[4 8 20] % O2 flow rate in sccm
 ccpPower = [ 100 200 500 800]

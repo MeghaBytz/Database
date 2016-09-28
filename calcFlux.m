@@ -1,0 +1,10 @@
+%inputs = density, electron Te, distribution? 
+%output = flux
+me=9.1095E-31;
+MO=1836*16*me; % mass of an Oxygen atom
+MO2=2*MO; % mass of an Oxygen Molecule
+ee=1.6022E-19;
+density = 10e+15;
+final_Te = 2;
+fluxVz_02 = density*sqrt((8*ee*final_Te/(pi*MO2)))/4;
+fluxVx_02 = density*sqrt(8*ee*final_Te*pi/(2*MO2))/2; %cm^2/s
