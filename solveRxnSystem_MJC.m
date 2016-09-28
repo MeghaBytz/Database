@@ -67,8 +67,8 @@ Kch=2.0E-17*sqrt(0.026/Tg);
 t0=0;
 tf=90;
 tic
-for ii=1:1%length(ppvec)
-gammaO=gammaOvec(ii)
+for ii=3:3%length(ppvec)
+gammaO=gammaOvec(ii);
 p=ppvec(ii);
 Qsccm=Qvec(ii);
 QtorrLit=Qsccm/79.05; % sccm to Torr-Liter/sec
@@ -88,7 +88,7 @@ Te0=2;
 pe0=1.5*(nO2plusbar0+nOplusbar0-nOminusbar0)*Te0; %quasineutrality condition for energy balance
 %v0=[nO20 nO2plusbar0 nOplusbar0 nOminusbar0 nObar0 nO2mbar0 nOmbar0 pe0];
 v0=[nO20 nO2plusbar0 nOplusbar0 nOminusbar0 nOmbar0 nO2mbar0 pe0];
-[t,v] = ode23s('dndt_MJC',[t0 tf],v0);
+[t,v] = ode23s('new_oxys_diss_iz',[t0 tf],v0);
 %[t,v] = ode23s(@(t,v)dndt_MJC(t,v),[t0 tf],v0);
 nO2=v(:,1);
 nO2plusbar=v(:,3);
@@ -234,12 +234,13 @@ wallLossFactors = [hAO final_hl];
 radicalVelocities = [vbarO] 
 ionVelocities = [final_uB_O2 final_uB_O] %make general using charge indexes
 %Calculate etch rate
-%set these to arbitrary values for function testing -- eventually will take
-%values from Bayesian inference
+
 radicals = n_O;
 ions = [n_O2plus n_Oplus];
 numberOfIons = length(ions);
 numberOfRadicals = length(radicals);
+%set these to arbitrary values for function testing -- eventually will take
+%values from Bayesian inference
 sputteringYield = ones(numberOfIons,1);
 ionStimulatedDesorption = ones(numberOfIons,1);
 rxnProb = ones(numberOfRadicals,1);

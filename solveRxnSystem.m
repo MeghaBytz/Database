@@ -66,7 +66,7 @@ Kch=2.0E-17*sqrt(0.026/Tg);
 %starting and end time
 t0=0;
 tf=90;
-vdotVector = sym(determineVdot());
+%vdotVector = sym(determineVdot());
 for ii=1:1%length(ppvec)
 gammaO=gammaOvec(ii)
 p=ppvec(ii);
