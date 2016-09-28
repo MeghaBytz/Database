@@ -17,7 +17,9 @@ Na = 6.02e+23;
 A = current(1:numberOfIons);
 B  =  current(numberOfIons+1:numberOfIons*2);
 rxnProb = current(numberOfIons*2+1:numberOfIons*2+numberOfRadicals)
-SCl = current(numberOfIons*2+numberOfRadicals+1:noUnknowns)
+numberOfIons*2+numberOfRadicals+1
+length(current)
+SCl = current(numberOfIons*2+numberOfRadicals+1:numberOfIons*2+numberOfRadicals*2+1)
 
 sputteringYield = A.*(sqrt(eps) - sqrt(epsS));
 ionStimulatedDesorption = B.*(sqrt(eps) - sqrt(epsD))
