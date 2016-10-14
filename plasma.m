@@ -1,4 +1,4 @@
-%function etchRate = plasma(current,i)
+function [Vx Vy] = plasma(current,i)
 i=1;
 global ee me MO MO2 ng Tg Ti l_p gammaO gammaO2m
 global Efactor_O2 Efactor_O EnergyO2 sigO2 EnergyO sigO
@@ -8,6 +8,10 @@ global numberOfIons
 global numberOfRadicals
 global expConditions
 global viewFactor
+
+numberOfIons = 2;
+numberOfRadicals = 1;
+noUnknowns = numberOfIons*2+numberOfRadicals*2+1;
 
 ee=1.6022E-19;
 me=9.1095E-31; % mass of electron
@@ -219,12 +223,13 @@ nO2m_flux=hAO*final_nO2m*vbarO2m/4*1e-4; % in /cm^2/s
 flux_ratio=nO_flux/nplus_flux;
 lambda_cm=lambda/1e-2; % in cm
 
-densities = [final_nplus final_nOplus final_nO2plus final_nO final_nO2m]
-fluxes = calcFluxes(densities, Te);
+densities = [ final_nO2m final_nO final_nOplus final_nO2plus ]
+current = [1 1 1 1 1 1 1]; %put in unknown parameters from RODEo
+[Vx Vy] = calcVelocities(densities, final_Te,current);
 %fluxes = [nO2plus_flux nOplus_flux nO_flux nO2m_flux]
 
 %Calculate etch rate
-etchRate = calcEtchRate(final_Te,fluxes, current)
+%etchRate = calcEtchRate(final_Te,fluxes, current)
 % save results
 % allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
 %  n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...

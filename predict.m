@@ -68,17 +68,17 @@ PosteriorCurrent = Posterior(current,1);
 %       [alpha,t, a,prob, PosteriorCatch] = MetropolisHastings(theta,current,PosteriorCurrent,j);
 %     end
 % end
-for cycle = 1:N  % Cycle to the number of samples
-    ind = 1;
-     for m=1:noUnknowns % Cycle to make the thinning
-            [alpha,t, a,prob, PosteriorCatch] = MetropolisHastings(theta,current,PosteriorCurrent,m);
-            theta((cycle-1)*noUnknowns+m,:) = t;        % Samples accepted
-            AlphaSet(cycle,m) = alpha;
-            current = t;
-            PosteriorCurrent = PosteriorCatch;
-            acc(m) = acc(m) + a;  % Accepted ?
-     end
-end
+% for cycle = 1:N  % Cycle to the number of samples
+%     ind = 1;
+%      for m=1:noUnknowns % Cycle to make the thinning
+%             [alpha,t, a,prob, PosteriorCatch] = MetropolisHastings(theta,current,PosteriorCurrent,m);
+%             theta((cycle-1)*noUnknowns+m,:) = t;        % Samples accepted
+%             AlphaSet(cycle,m) = alpha;
+%             current = t;
+%             PosteriorCurrent = PosteriorCatch;
+%             acc(m) = acc(m) + a;  % Accepted ?
+%      end
+% end
  
 
 accrate = acc/N;     % Acceptance rate,. 

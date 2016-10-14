@@ -1,4 +1,4 @@
-function [Vx Vy] = calcFlux(density,Te,current)
+function [Vx Vy] = calcVelocities(density,Te,current)
 %inputs = density, electron Te, distribution? 
 %output = flux
 %need to make this universal for any number of ions and neutrals
@@ -6,7 +6,6 @@ me=9.1095E-31;
 MO=1836*16*me; % mass of an Oxygen atom
 MO2=2*MO; % mass of an Oxygen Molecule
 ee=1.6022E-19;
-density = [10e+15 10e+15 10e+15 10e+15];
 nO = density(1);
 nO2m = density(2);
 nOplus = density(3);

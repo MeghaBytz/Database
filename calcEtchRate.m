@@ -14,7 +14,7 @@ eps = 5.2*Te
 M = 40.3;
 Na = 6.02e+23;
 
-A = current(1:numberOfIons);
+A = current(1:numberOfIons)
 B  =  current(numberOfIons+1:numberOfIons*2);
 rxnProb = current(numberOfIons*2+1:numberOfIons*2+numberOfRadicals)
 numberOfIons*2+numberOfRadicals+1
