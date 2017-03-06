@@ -6,15 +6,15 @@ global expConditions
 
 
 load y
-load theta_withNoise
+load('theta_withNoise.mat')
 load('algernonEtchRatesWithNoise.mat')
-test = algernonEtchRatesWithNoise
-% testSet = y;
-% data = algernonEtchRatesWithNoise(testSet(7:end));
-% expConditions = allSynExpConditions(testSet(7:end),:);
-% 
-% inferred = mean(theta_withNoise);
-% 
-% for k=1:length(data)
-%         inferredTestEtchRates(k) = plasma(inferred,k);
-% end
+test = algernonEtchRates;
+load allSynExpConditions
+load algernonEtchRates
+testSet = y;
+data = algernonEtchRates(testSet(7:end));
+expConditions = [6.02,4,0.5,500]
+
+inferred = mean(theta);
+Te = 2;
+etchRates = plasma(inferred,1);

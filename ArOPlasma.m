@@ -1,4 +1,5 @@
-function [etchRates] = plasma(current,i)
+clear all 
+close all
 global ee me MO MO2 ng Tg Ti l_p gammaO gammaO2m
 global Efactor_O2 Efactor_O EnergyO2 sigO2 EnergyO sigO
 global Krec Krec2 Krec3 Krec4 Kdet Kch Rlambda hl0 Rrec alphabar
@@ -33,14 +34,13 @@ EnergyO = Ocross(:,1);
 sigmaO = Ocross(:,2);
 sigO = sigmaO * 1e-20;
 % power input
-length(expConditions)
-Pabs=expConditions(i,4); % total absorbed power in watts [adjustable] 
+Pabs=180; % total absorbed power in watts [adjustable] 
 pabs=Pabs/(ee*volume);
 % starting pressures in mTorr (180W)
 % atomic oxygen surface recombination rate
-gammaO=expConditions(i,3);
-p=expConditions(i,1);
-Qsccm=expConditions(i,2);
+gammaO=0.5;
+p=6.02;
+Qsccm=40;
 QtorrLit=Qsccm/79.05; % sccm to Torr-Liter/sec
 Qmolec=4.483e17*Qsccm; % sccm to molecules/sec
 Kpump=2*QtorrLit/(p*volume); % Pumping Rate coefficient
@@ -101,40 +101,40 @@ final_Ec_O=o_ec(final_Te);
 final_p=final_ng/3.3e19*(Tg/0.026); % final pressure in mTorr
 % ratio for density weighting
 nOp_ratio=final_nOplusbar/(final_nO2plusbar+final_nOplusbar);
-% plotting the results
-% figure(ii)
-% subplot(7,1,1)
-% plot(t,nO2plusbar,t, ne0,'--')
-% ylabel('n_{{O_2}^+}, n_{e0} (m^{-3})')
-% axis([0 inf 0 final_nO2plusbar*1.5])
-% title(['Flowrate=',num2str(Qsccm),'sccm, P_{abs}=',num2str(Pabs),...
-%  'W, p_0=',num2str(p),'mTorr, p_f=',num2str(round(final_p)),...
-%  'mTorr'])
-% subplot(7,1,2)
-% plot(t,nOplusbar)
-% ylabel('n_{O^+} (m^{-3})')
-% axis([0 inf 0 final_nOplusbar*1.5])
-% subplot(7,1,3)
-% plot(t,nOminusbar)
-% ylabel('n_{O^-} (m^{-3})')
-% axis([0 inf 0 final_nOminusbar*1.5])
-% subplot(7,1,4)
-% plot(t,nObar)
-% ylabel('n_O (m^{-3})')
-% axis([0 inf 0 final_nObar*1.5])
-% subplot(7,1,5)
-% plot(t,nO2mbar)
-% ylabel('n_{{O_2}*} (m^{-3})')
-% axis([0 inf 0 final_nO2mbar*1.5])
-% subplot(7,1,6)
-% plot(t,nO2)
-% ylabel('n_{O_2} (m^{-3})')
-% axis([0 inf 0 final_nO2*1.5])
-% subplot(7,1,7)
-% plot(t,Te)
-% xlabel('t (sec)')
-% ylabel('T_e (m^{-3})')
-% axis([0 inf 0 final_Te*1.5])
+%plotting the results
+figure
+subplot(7,1,1)
+plot(t,nO2plusbar,t, ne0,'--')
+ylabel('n_{{O_2}^+}, n_{e0} (m^{-3})')
+axis([0 inf 0 final_nO2plusbar*1.5])
+title(['Flowrate=',num2str(Qsccm),'sccm, P_{abs}=',num2str(Pabs),...
+ 'W, p_0=',num2str(p),'mTorr, p_f=',num2str(round(final_p)),...
+ 'mTorr'])
+subplot(7,1,2)
+plot(t,nOplusbar)
+ylabel('n_{O^+} (m^{-3})')
+axis([0 inf 0 final_nOplusbar*1.5])
+subplot(7,1,3)
+plot(t,nOminusbar)
+ylabel('n_{O^-} (m^{-3})')
+axis([0 inf 0 final_nOminusbar*1.5])
+subplot(7,1,4)
+plot(t,nObar)
+ylabel('n_O (m^{-3})')
+axis([0 inf 0 final_nObar*1.5])
+subplot(7,1,5)
+plot(t,nO2mbar)
+ylabel('n_{{O_2}*} (m^{-3})')
+axis([0 inf 0 final_nO2mbar*1.5])
+subplot(7,1,6)
+plot(t,nO2)
+ylabel('n_{O_2} (m^{-3})')
+axis([0 inf 0 final_nO2*1.5])
+subplot(7,1,7)
+plot(t,Te)
+xlabel('t (sec)')
+ylabel('T_e (m^{-3})')
+axis([0 inf 0 final_Te*1.5])
 % caculating values for O neutral & O2m
 lambda=1/(final_ng*scat_Xsec); % lambda in m
 vbarO=sqrt(8*ee*Ti/(pi*MO)); % average thermal velocity of O neutral
@@ -219,13 +219,17 @@ nO2m_flux=hAO*final_nO2m*vbarO2m/4*1e-4; % in /cm^2/s
 flux_ratio=nO_flux/nplus_flux;
 lambda_cm=lambda/1e-2; % in cm
 
-ionDensities = [final_nO2plus final_nOplus];
-radicalDensities = final_nO;
-[ionFlux radicalFlux]= calcFlux(ionDensities,radicalDensities, final_Te);
-fluxes = [nO2plus_flux nOplus_flux nO_flux nO2m_flux]
+% ionDensities = [final_nO2plus final_nOplus];
+% radicalDensities = final_nO;
+% [ionFlux radicalFlux]= calcFlux(ionDensities,radicalDensities, final_Te);
+% etchRates = calcEtchRate(final_Te,ionFlux,radicalFlux,current);
+% [ionFlux]
+% [nO2plus_flux]
+% [nOplus_flux]
+%fluxes = [nO2plus_flux nOplus_flux nO_flux nO2m_flux]
 
 %Calculate etch rate
-etchRates = calcEtchRate(final_Te,fluxes, current)
+%etchRate = calcEtchRate(final_Te,fluxes, current)
 % save results
 % allresults(:,ii)=[p;final_p;Pabs;ng0_cm;n_g;n_O2plus;n_Oplus;...
 %  n_Ominus;n_e0;n_e0_2;n_O;n_O2m;n_O2plus_bar;n_Oplus_bar;...

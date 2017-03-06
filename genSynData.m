@@ -7,7 +7,7 @@ global numberOfRadicals
 
 numberOfIons = 2;
 numberOfRadicals = 1;
-noUnknowns = numberOfIons*2+numberOfRadicals*2;
+noUnknowns = numberOfIons*2+numberOfRadicals*2+1;
 
 load allSynExpConditions
 load allSynData
@@ -24,7 +24,8 @@ A = [0.05 .1];
 B = [0.08 .3];
 rxnProb = 0.7;
 SCl = .8;
-algernonUnknowns = [A B rxnProb SCl];
+noise = 1;
+algernonUnknowns = [A B rxnProb SCl noise];
 for i = 1:length(expConditions)
- algernonEtchRates(i) = plasma(algernonUnknowns,i);
+ algernonEtchRates(i,:) = plasma(algernonUnknowns,i);
 end
